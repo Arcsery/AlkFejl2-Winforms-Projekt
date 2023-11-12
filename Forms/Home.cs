@@ -21,7 +21,6 @@ namespace hazi2
         }
 
 
-
         private void Home_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
@@ -53,6 +52,14 @@ namespace hazi2
 
         private void InitializeDataGridView()
         {
+
+
+            DataGridViewTextBoxColumn idColumn = new DataGridViewTextBoxColumn();
+            idColumn.HeaderText = "id";
+            idColumn.DataPropertyName = "id";
+            idColumn.Name = "id";
+            vaultDataGriedView.Columns.Add(idColumn);
+
             DataGridViewTextBoxColumn useridColumn = new DataGridViewTextBoxColumn();
             useridColumn.HeaderText = "userid";
             useridColumn.DataPropertyName = "userid";
@@ -86,6 +93,17 @@ namespace hazi2
 
             // DataGridView adatforrásának beállítása
             vaultDataGriedView.DataSource = vaultData;
+
+            DataGridViewButtonColumn logUserIdColumn = new DataGridViewButtonColumn();
+            logUserIdColumn.HeaderText = "logId";
+            logUserIdColumn.Text = "logId";
+            logUserIdColumn.Name = "logId";
+            logUserIdColumn.UseColumnTextForButtonValue = true;
+            vaultDataGriedView.Columns.Add(logUserIdColumn);
+
+            // Wire up the CellContentClick event to handle button clicks
+            vaultDataGriedView.CellContentClick += vaultDataGriedView_CellContentClick;
+
         }
 
         public void AddNewRowToDataGridView(Vault vault)
@@ -93,9 +111,18 @@ namespace hazi2
             DataTable dataTable = (DataTable)vaultDataGriedView.DataSource;
             byte[] decodedBytes = Convert.FromBase64String(vault.webPassword.ToString());
             string decodedPassword = Encoding.UTF8.GetString(decodedBytes);
-            dataTable.Rows.Add(vault.userId, vault.webUsername, decodedPassword, vault.webSite);
+            dataTable.Rows.Add(vault.id ,vault.userId, vault.webUsername, decodedPassword, vault.webSite);
             vaultDataGriedView.DataSource = null;
             vaultDataGriedView.DataSource = dataTable;
+        }
+
+        private void vaultDataGriedView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == vaultDataGriedView.Columns["logId"].Index && e.RowIndex != -1)
+            {
+                int id = Convert.ToInt32(vaultDataGriedView.Rows[e.RowIndex].Cells["id"].Value);
+                System.Diagnostics.Debug.WriteLine("ID clicked (button): " + id);
+            }
         }
     }
 }

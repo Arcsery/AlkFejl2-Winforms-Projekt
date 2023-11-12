@@ -57,24 +57,34 @@ public class DatabaseManager
         }
     }
 
-    public void InsertVault(Vault vault)
+    public Vault InsertVaultAndGetDetails(Vault vault)
     {
         using (SQLiteConnection connection = new SQLiteConnection(connectionString))
         {
             connection.Open();
-            string query = "INSERT INTO Vault (userid, webUsername, webPassword, website) VALUES (@userid, @webUsername, @webPassword, @website)";
-            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+
+            string insertQuery = "INSERT INTO Vault (userid, webUsername, webPassword, website) VALUES (@userid, @webUsername, @webPassword, @website);" +
+                                 "SELECT last_insert_rowid();"; // A beszúrt sor azonosítójának lekérdezése
+
+            using (SQLiteCommand command = new SQLiteCommand(insertQuery, connection))
             {
                 command.Parameters.AddWithValue("@userid", vault.userId);
                 command.Parameters.AddWithValue("@webUsername", vault.webUsername);
                 command.Parameters.AddWithValue("@webPassword", vault.webPassword);
                 command.Parameters.AddWithValue("@website", vault.webSite);
 
-                command.ExecuteNonQuery();
+                int insertedRowId = Convert.ToInt32(command.ExecuteScalar());
+
+                // Most hozz létre egy új Vault objektumot az éppen beszúrt sor adataival
+                Vault insertedVault = new Vault(vault.userId, vault.webUsername, vault.webPassword, vault.webSite, insertedRowId);
+
+                connection.Close();
+
+                return insertedVault;
             }
-            connection.Close();
         }
     }
+
 
 
     public void SelectAllUsers()
@@ -162,6 +172,7 @@ public class DatabaseManager
     public DataTable GetVaultDataByUserId(int userId)
     {
         DataTable dataTable = new DataTable();
+        dataTable.Columns.Add("id", typeof(int));
         dataTable.Columns.Add("userid", typeof(int));
         dataTable.Columns.Add("webUsername", typeof(string));
         dataTable.Columns.Add("webPassword", typeof(string));
@@ -171,7 +182,7 @@ public class DatabaseManager
         {
             connection.Open();
 
-            string getVaultDataQuery = "SELECT userid,webUsername,webPassword,website FROM Vault WHERE UserID = @userId";
+            string getVaultDataQuery = "SELECT * FROM Vault WHERE UserID = @userId";
 
             using (SQLiteCommand cmd = new SQLiteCommand(getVaultDataQuery, connection))
             {
@@ -183,7 +194,7 @@ public class DatabaseManager
                         string webPasswordBase64 = reader["webPassword"].ToString();
                         string webPasswordDecoded = DecodeBase64(webPasswordBase64);
 
-                        dataTable.Rows.Add(reader["userid"], reader["webUsername"], webPasswordDecoded, reader["website"]);
+                        dataTable.Rows.Add(reader["id"], reader["userid"], reader["webUsername"], webPasswordDecoded, reader["website"]);
                     }
                 }
             }

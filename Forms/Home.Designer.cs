@@ -51,8 +51,9 @@
             vaultDataGriedView.Location = new Point(380, 36);
             vaultDataGriedView.Name = "vaultDataGriedView";
             vaultDataGriedView.RowTemplate.Height = 25;
-            vaultDataGriedView.Size = new Size(520, 402);
+            vaultDataGriedView.Size = new Size(650, 402);
             vaultDataGriedView.TabIndex = 1;
+            vaultDataGriedView.CellClick += vaultDataGriedView_CellClick;
             vaultDataGriedView.CellContentClick += vaultDataGriedView_CellContentClick;
             // 
             // addPassword
@@ -69,7 +70,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(904, 450);
+            ClientSize = new Size(1042, 450);
             Controls.Add(addPassword);
             Controls.Add(vaultDataGriedView);
             Controls.Add(usernameHomeText);

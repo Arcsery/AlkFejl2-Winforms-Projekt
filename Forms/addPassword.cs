@@ -30,8 +30,8 @@ namespace hazi2
         {
             Vault vault = new Vault(userId, webNameTextBox.Text,webPasswordTextBox.Text,websiteTextBox.Text);
             DatabaseManager databaseManager = new DatabaseManager();
-            databaseManager.InsertVault(vault);
-            _homeForm.AddNewRowToDataGridView(vault);
+            Vault vaultWithid = databaseManager.InsertVaultAndGetDetails(vault);
+            _homeForm.AddNewRowToDataGridView(vaultWithid);
             this.Close();
             System.Diagnostics.Debug.WriteLine(userId);
         }
